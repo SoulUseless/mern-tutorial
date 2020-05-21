@@ -1,0 +1,74 @@
+import { useCallback, useReducer } from 'react';
+
+function formReducer(state, action) {
+    switch (action.type) {
+        case 'INPUT_CHANGE':
+            let formIsValid = true;
+            for (const inputId in state.inputs) {
+                if(!state.inputs[inputId]) {
+                    continue;
+                }
+                if (inputId === action.inputId) {
+                    formIsValid = formIsValid && action.isValid;
+                } else {
+                    formIsValid = formIsValid && state.inputs[inputId].isValid;
+                }
+            }
+            return {
+                ...state,
+                inputs: {
+                    ...state.inputs,
+                    [action.inputId]: {
+                        value: action.value,
+                        isValid: action.isValid,
+                    },
+                }, 
+                isValid: formIsValid
+            };
+        
+        case 'SET_DATA':
+            return {
+                inputs: action.inputs,
+                isValid: action.formIsValid
+            }
+
+        default:
+            return state;
+    }   
+}
+
+//this becomes a custom hook like useReducer, returning a state, and a function to update the state
+export function useForm(initialInputs, initialFormValidity) {
+    const [formState, dispatch] = useReducer(formReducer, {
+        inputs: initialInputs,
+        isValid: initialFormValidity
+    }); 
+
+    //takes in params required for onInput in Input.js
+    //useCallback wraps the function to prevent triggering of 
+    //infinite loops with new function signatures resulting in change 
+    //in data which triggers creation of new function objects
+    
+    //dependencies are stored to re-render the function
+    //else the function is "memoized" and stored away for future use => no new function object created
+    const inputHandler = useCallback((id, value, isValid) => {
+        dispatch({
+            type: "INPUT_CHANGE",
+            value: value,
+            isValid: isValid,
+            inputId: id,
+        });
+    }, []);
+
+    //setFormData basically completely overrides the stored form data
+    //intended for pushing in information that arrived late
+    const setFormData = useCallback((inputData, formValidity) => {
+        dispatch({
+            type: "SET_DATA",
+            inputs: inputData,
+            formIsValid: formValidity
+        });
+    }, []);
+
+    return [formState, inputHandler, setFormData];
+} 

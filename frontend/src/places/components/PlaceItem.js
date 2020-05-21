@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import Card from "../../shared/components/UIElements/Card.js";
 import Modal from "../../shared/components/UIElements/Modal.js";
 import Button from "../../shared/components/FormElements/Button.js";
 import Map from "../../shared/components/UIElements/Map.js"; 
+import { AuthContext } from "../../shared/context/auth-context";
 import './PlaceItem.css';
 
 function PlaceItem(props) {
+    const auth = useContext(AuthContext);
+
     const [showMap, setShowMap] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     function openMapHandler() {
         setShowMap(true);
@@ -17,6 +21,19 @@ function PlaceItem(props) {
         setShowMap(false);
     }
      
+    function showDeleteWarningHandler() {
+        setShowConfirmModal(true);
+    }
+
+    function closeDeleteWarningHandler() {
+        setShowConfirmModal(false);
+    }
+
+    function confirmDeleteHandler() {
+        setShowConfirmModal(false);
+        console.log("DELETED");
+    }
+
     return (
         <React.Fragment>
             <Modal
@@ -32,6 +49,25 @@ function PlaceItem(props) {
                 </div>
             </Modal>
 
+            <Modal
+                show={showConfirmModal}
+                header="Are you sure?"
+                footerClass="place-item__modal-actions"
+                footer={
+                    <React.Fragment>
+                        <Button inverse onClick={closeDeleteWarningHandler}>
+                            Cancel{" "}
+                        </Button>
+
+                        <Button danger onClick={confirmDeleteHandler}>
+                            Delete{" "}
+                        </Button>
+                    </React.Fragment>
+                }
+            >
+                <p class="center">Do you want to proceed and delete?</p>
+            </Modal>
+
             <li className="place-item">
                 <Card className="place-item__content">
                     <div className="place-item__image">
@@ -45,9 +81,21 @@ function PlaceItem(props) {
                     </div>
 
                     <div className="place-item__actions">
-                        <Button inverse onClick={openMapHandler}> VIEW ON MAP </Button>
-                        <Button to={`/places/${props.id}`}> EDIT </Button>
-                        <Button danger> DELETE </Button>
+                        <Button inverse onClick={openMapHandler}>
+                            VIEW ON MAP
+                        </Button>
+
+                        {auth.isLoggedIn && (
+                            <Button to={`/places/${props.id}`}> 
+                                EDIT 
+                            </Button>
+                        )}
+
+                        {auth.isLoggedIn && (
+                            <Button danger onClick={showDeleteWarningHandler}>
+                                DELETE
+                            </Button>
+                        )}
                     </div>
                 </Card>
             </li>

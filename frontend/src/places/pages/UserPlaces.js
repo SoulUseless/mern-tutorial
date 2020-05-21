@@ -20,7 +20,7 @@ const DUMMY_PLACES = [
     {  
         id: "p2",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/20/Rear_view_of_the_Merlion_statue_at_Merlion_Park%2C_Singapore%2C_with_Marina_Bay_Sands_in_the_distance_-_20140307.jpg",
-        title: "Merlion",
+        title: "Merelion",
         description: "foobarfizzbang",
         address: "Marina Bay",
         creator: "u2",

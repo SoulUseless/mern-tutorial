@@ -7,9 +7,9 @@ function Map(props) {
 
     const { center, zoom } = props;
     
-    {/* useEffect delays the running of the inner function
+    /* useEffect delays the running of the inner function
         it runs on the first rendering, but will update again when center and zoom is updated
-    in the return statement -> renders properly */}
+    in the return statement -> renders properly */
     useEffect(() => {
         const map = new window.google.maps.Map(mapRef.current, {
             center: center,

@@ -24,15 +24,19 @@ function inputReducer(state, action) {
 }
 
 function Input(props) {
-    {/* can always have code to have 2 useStates, but useReducer is easier for complex logic 
-        useReducer( <BiFunction taking in state and action and returns new action>, <initial values> */}
-    const [inputState, dispatch] = useReducer(inputReducer, {value: "", isValid: false, isTouched: false});
+    // can always have code to have 2 useStates, but useReducer is easier for complex logic 
+    //  useReducer( <BiFunction taking in state and action and returns new action>, <initial values>
+    const [inputState, dispatch] = useReducer(inputReducer, {
+        value: props.initialValue || "",
+        isValid: props.initialIsValid || false,
+        isTouched: false,
+    });
 
     const { id, onInput } = props;
     const { value, isValid } = inputState;
 
     useEffect(
-        () => props.onInput(id, value, isValid),
+        () => onInput(id, value, isValid),
         [id, onInput, value, isValid]
     ); //will rerun the function when the following dependencies change
 
