@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/mern-tutorial/static/css/main.eb3e390a.chunk.css",
-    "main.js": "/mern-tutorial/static/js/main.627fd481.chunk.js",
-    "main.js.map": "/mern-tutorial/static/js/main.627fd481.chunk.js.map",
+    "main.css": "/mern-tutorial/static/css/main.74d8b576.chunk.css",
+    "main.js": "/mern-tutorial/static/js/main.2fbc2c0d.chunk.js",
+    "main.js.map": "/mern-tutorial/static/js/main.2fbc2c0d.chunk.js.map",
     "runtime-main.js": "/mern-tutorial/static/js/runtime-main.5629f23c.js",
     "runtime-main.js.map": "/mern-tutorial/static/js/runtime-main.5629f23c.js.map",
-    "static/js/2.9cb043cb.chunk.js": "/mern-tutorial/static/js/2.9cb043cb.chunk.js",
-    "static/js/2.9cb043cb.chunk.js.map": "/mern-tutorial/static/js/2.9cb043cb.chunk.js.map",
+    "static/js/2.7b6db41f.chunk.js": "/mern-tutorial/static/js/2.7b6db41f.chunk.js",
+    "static/js/2.7b6db41f.chunk.js.map": "/mern-tutorial/static/js/2.7b6db41f.chunk.js.map",
     "index.html": "/mern-tutorial/index.html",
-    "precache-manifest.86bf377d9a80eea1fc6d2df06f2c1e69.js": "/mern-tutorial/precache-manifest.86bf377d9a80eea1fc6d2df06f2c1e69.js",
+    "precache-manifest.de065a2ab9d46be3170ad8910d868b06.js": "/mern-tutorial/precache-manifest.de065a2ab9d46be3170ad8910d868b06.js",
     "service-worker.js": "/mern-tutorial/service-worker.js",
-    "static/css/main.eb3e390a.chunk.css.map": "/mern-tutorial/static/css/main.eb3e390a.chunk.css.map"
+    "static/css/main.74d8b576.chunk.css.map": "/mern-tutorial/static/css/main.74d8b576.chunk.css.map"
   },
   "entrypoints": [
     "static/js/runtime-main.5629f23c.js",
-    "static/js/2.9cb043cb.chunk.js",
-    "static/css/main.eb3e390a.chunk.css",
-    "static/js/main.627fd481.chunk.js"
+    "static/js/2.7b6db41f.chunk.js",
+    "static/css/main.74d8b576.chunk.css",
+    "static/js/main.2fbc2c0d.chunk.js"
   ]
 }
