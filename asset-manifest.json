@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/mern-tutorial/static/css/main.eb3e390a.chunk.css",
+    "main.js": "/mern-tutorial/static/js/main.627fd481.chunk.js",
+    "main.js.map": "/mern-tutorial/static/js/main.627fd481.chunk.js.map",
+    "runtime-main.js": "/mern-tutorial/static/js/runtime-main.5629f23c.js",
+    "runtime-main.js.map": "/mern-tutorial/static/js/runtime-main.5629f23c.js.map",
+    "static/js/2.9cb043cb.chunk.js": "/mern-tutorial/static/js/2.9cb043cb.chunk.js",
+    "static/js/2.9cb043cb.chunk.js.map": "/mern-tutorial/static/js/2.9cb043cb.chunk.js.map",
+    "index.html": "/mern-tutorial/index.html",
+    "precache-manifest.86bf377d9a80eea1fc6d2df06f2c1e69.js": "/mern-tutorial/precache-manifest.86bf377d9a80eea1fc6d2df06f2c1e69.js",
+    "service-worker.js": "/mern-tutorial/service-worker.js",
+    "static/css/main.eb3e390a.chunk.css.map": "/mern-tutorial/static/css/main.eb3e390a.chunk.css.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.5629f23c.js",
+    "static/js/2.9cb043cb.chunk.js",
+    "static/css/main.eb3e390a.chunk.css",
+    "static/js/main.627fd481.chunk.js"
+  ]
+}
