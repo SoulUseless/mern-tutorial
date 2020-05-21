@@ -7,7 +7,7 @@ import './UserPlaces.css';
 const DUMMY_PLACES = [
     {  
         id: "p1",
-        imageUrl: "https://img.travelawaits.com/quill/f/d/f/c/2/4/fdfc242ffd612382c212e04702e4d5f0fae144dd.jpg",
+        imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/20/Rear_view_of_the_Merlion_statue_at_Merlion_Park%2C_Singapore%2C_with_Marina_Bay_Sands_in_the_distance_-_20140307.jpg",
         title: "Merlion",
         description: "foobarfizzbang",
         address: "Marina Bay",
@@ -19,7 +19,7 @@ const DUMMY_PLACES = [
     }, 
     {  
         id: "p2",
-        imageUrl: "https://img.travelawaits.com/quill/f/d/f/c/2/4/fdfc242ffd612382c212e04702e4d5f0fae144dd.jpg",
+        imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/20/Rear_view_of_the_Merlion_statue_at_Merlion_Park%2C_Singapore%2C_with_Marina_Bay_Sands_in_the_distance_-_20140307.jpg",
         title: "Merlion",
         description: "foobarfizzbang",
         address: "Marina Bay",
