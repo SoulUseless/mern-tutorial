@@ -23,8 +23,8 @@ function App() {
   let routes;
 
   if (isLoggedIn) {
-    {/* path is the url path, exact means only that path will render this thing */}
-    {/* paths can stack (one with exact for only the page one without exact to load all the time) */}
+    // path is the url path, exact means only that path will render this thing
+    // paths can stack (one with exact for only the page one without exact to load all the time)
     routes = (
       <Switch>
         <Route path="/" exact={true}>
