@@ -1,7 +1,10 @@
 //files contain middleware functions/ controllers
 
-const HttpError = require("../models/http-error");
 const { uuid } = require("uuidv4");
+const { validationResult } = require("express-validator");
+
+const HttpError = require("../models/http-error");
+const getCoordsForAddress = require("../util/location");
 
 let DUMMY_PLACES = [
     {  
@@ -58,40 +61,63 @@ const getPlacesByUserId = (req, res, next) => {
 }
 
 //called from POST request => have request body unlike GET request
-const createPlace = (req, res, next) => {
-    const { title, description, coordinates, address, creator } = req.body;
-    const createdPlace = {
-        id: uuid(),
-        title,
-        description,
-        location: coordinates,
-        address,
-        creator
-    };
-    DUMMY_PLACES.push(createdPlace);
+const createPlace = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+        const { title, description, address, creator } = req.body;
 
-    res.status(201); //code represents something new created on server
-    return res.json({ place: createdPlace });
+        //must wrap in try catch block if the async promise can throw an error
+        try {
+            const coordinates = await getCoordsForAddress(address);
+            const createdPlace = {
+                id: uuid(),
+                title,
+                description,
+                location: coordinates,
+                address,
+                creator
+            };
+            DUMMY_PLACES.push(createdPlace);
+
+            res.status(201); //code represents something new created on server
+            return res.json({ place: createdPlace });
+        } catch (error) {
+            //forward the error
+            next(error);
+            return;
+        }
+    } else {
+        console.log(errors);
+        //throwing errors wouldnt work properly in async functions 
+        next(HttpError("Invalid inputs detected", 422));
+        return;
+    }
 
 }
 
 //patch request also have body
 const updatePlaceById = (req, res, next) => {
-    const placeId = req.params.pid; // stored as keys: { pid: "XXX" }
-    const place = DUMMY_PLACES.find(p => placeId === p.id);
-    const { title, description } = req.body;
-    if (place) {
-        const updatedPlace = { ...place };
-        const placeIndex = DUMMY_PLACES.findIndex(p => placeId === p.id);
-
-        updatedPlace.title = title;
-        updatedPlace.description = description;
-
-        DUMMY_PLACES[placeIndex] = updatedPlace;
-
-        res.status(200).json({ place: updatedPlace });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        throw new HttpError("Invalid inputs detected", 422);
     } else {
-        throw new HttpError("Place not found", 404);
+        const placeId = req.params.pid; // stored as keys: { pid: "XXX" }
+        const place = DUMMY_PLACES.find(p => placeId === p.id);
+        const { title, description } = req.body;
+        if (place) {
+            const updatedPlace = { ...place };
+            const placeIndex = DUMMY_PLACES.findIndex(p => placeId === p.id);
+
+            updatedPlace.title = title;
+            updatedPlace.description = description;
+
+            DUMMY_PLACES[placeIndex] = updatedPlace;
+
+            res.status(200).json({ place: updatedPlace });
+        } else {
+            throw new HttpError("Place not found", 404);
+        }
     }
 }
 

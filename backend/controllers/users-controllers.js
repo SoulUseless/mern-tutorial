@@ -1,5 +1,6 @@
 
 const express = require('express');
+const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 const { uuid } = require("uuidv4");
@@ -44,8 +45,12 @@ const userLogin = (req, res, next) => {
 }
 
 const userSignup = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        throw new HttpError("Invalid input detected", 422);
+    }
     const { name, email, password } = req.body;
-
     if (DUMMY_USERS.find(u => email === u.email)) {
         throw new HttpError("Email already in the system", 422);
     }
