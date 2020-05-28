@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require("mongoose");
 
 //the imported constants are just middleware now
 const placesRoutes = require('./routes/places-routes');
@@ -34,4 +35,13 @@ app.use((error, req, res, next) => {
 
 });
 
-app.listen(5000);
+const url = "mongodb+srv://<username>:<pw>@cluster0-un6y8.gcp.mongodb.net/mern-tutorial?retryWrites=true&w=majority";
+mongoose
+    .connect(url)
+    .then(() => {
+        console.log("db connected");
+        app.listen(5000);
+    })
+    .catch((err) => {
+        console.log(err);
+    });

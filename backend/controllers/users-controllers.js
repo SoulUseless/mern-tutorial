@@ -4,7 +4,9 @@ const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 const { uuid } = require("uuidv4");
+const User = require("../models/user");
 
+/*
 let DUMMY_USERS = [
     {
         id: 'u1', 
@@ -13,48 +15,75 @@ let DUMMY_USERS = [
         email: "test@test.com"
     }
 ];
+*/
 
-const getAllUsers = (req, res, next) => {
-    res.status(200).json({users: DUMMY_USERS}) ;
-}
-
-const getUserById = (req, res, next) => {
-    const userId = req.params.uid; // stored as keys: { uid: "XXX" }
-    const user = DUMMY_USERS.find(u => userId === u.id);
-    console.log("GET request user");
-    //json is automatically sent back
-    if (user) {
-        res.json({ user }); // => { user } === { user: user }
-    } else {
-        res.json({message: "user not found"});
+const getAllUsers = async (req, res, next) => {
+    let users;
+    try {
+        users = await User.find({}, "-password");
+        //either whitelist with <name>, or blacklist with "-<name>""
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("database access error", 500));
+        return;
     }
+    //const users = User.find()
+    res.status(200).json({
+        users: users.map((user) => user.toObject({ getters: true })),
+    });
 }
 
-const userLogin = (req, res, next) => {
+const userLogin = async (req, res, next) => {
+    
+    console.log("started");
     const { email, password } = req.body;
-    const user = DUMMY_USERS.find(u => email === u.email);
+    
+    let user;
+    try {
+        user = await User.findOne({email});
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("log in failed", 500));
+        return;
+    }
+
+    //const user = DUMMY_USERS.find(u => email === u.email);
     if (user) {
         if (user.password === password) {
             res.status(200).json({ message: "login success" });
         } else {
-            throw new HttpError("Password is incorrect", 401);
+            next(new HttpError("Password is incorrect", 401));
+            return;
         }
     } else {
-        throw new HttpError("Username is incorrect", 401);
+        next(new HttpError("Username is incorrect", 401));
+        return;
     }
 }
 
-const userSignup = (req, res, next) => {
+const userSignup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
-        throw new HttpError("Invalid input detected", 422);
+        next(new HttpError("Invalid input detected", 422));
+        return;
     }
     const { name, email, password } = req.body;
-    if (DUMMY_USERS.find(u => email === u.email)) {
-        throw new HttpError("Email already in the system", 422);
+
+    let existingUser;
+    try {
+        existingUser = await User.findOne({email});
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("failed to access database", 500));
+        return;
     }
-    
+
+    if (existingUser) {
+        next(new HttpError("User exists, log in instead", 422));
+        return;
+    }
+    /*
     const createdUser = {
         id: uuid(), 
         password,
@@ -63,10 +92,27 @@ const userSignup = (req, res, next) => {
     };
 
     DUMMY_USERS.push(createdUser);
-    res.status(201).json({ user: createdUser });
+    */
+    const createdUser = new User({
+        name,
+        password, //plain text for now
+        email,
+        image: "https://souluseless.github.io/controlled_alcoholism/images/whisky/hibiki_17.jpg",
+        places: []
+    });
+
+    try {
+        await createdUser.save();
+        console.log("new user created");
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("failed to create new user", 500));
+        return;
+    }
+    
+    res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 }
 
 exports.userLogin = userLogin;
 exports.userSignup = userSignup;
-exports.getUserById = getUserById;
 exports.getAllUsers = getAllUsers;

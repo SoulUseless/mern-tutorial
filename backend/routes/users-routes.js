@@ -9,8 +9,6 @@ const router = express.Router();
 //filter here refers to relative path after being parsed from app.js
 router.get("/", userController.getAllUsers);
 
-router.get("/:uid", userController.getUserById);
-
 router.post(
     "/signup",
     [
