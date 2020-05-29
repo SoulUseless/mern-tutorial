@@ -3,6 +3,7 @@
 const { uuid } = require("uuidv4");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const fs = require("fs");
 
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
@@ -131,7 +132,7 @@ const createPlace = async (req, res, next) => {
                 description,
                 address,
                 location: coordinates,
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Rear_view_of_the_Merlion_statue_at_Merlion_Park%2C_Singapore%2C_with_Marina_Bay_Sands_in_the_distance_-_20140307.jpg/1280px-Rear_view_of_the_Merlion_statue_at_Merlion_Park%2C_Singapore%2C_with_Marina_Bay_Sands_in_the_distance_-_20140307.jpg",
+                image: req.file.path,
                 creator
             });
             
@@ -253,6 +254,7 @@ const deletePlace = async (req, res, next) => {
         return next(new HttpError("Search failed, nothing to delete", 404));
     }
 
+    const imagePath = place.image;
     try {
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -270,6 +272,11 @@ const deletePlace = async (req, res, next) => {
         next(new HttpError("deletion failed", 500));
         return;
     }
+
+    fs.unlink(imagePath, (err) => {
+        console.log(err);
+    });
+
     res.status(200).json({ message: "Successfully Deleted." });
 }
 

@@ -9,6 +9,7 @@ import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { useForm } from "../../shared/hooks/form-hook.js";
 import { useHttpClient } from "../../shared/hooks/http-hook.js";
 import { AuthContext } from "../../shared/context/auth-context";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 import "./Auth.css";
 
@@ -39,6 +40,8 @@ function Auth(props) {
     async function authSubmitHandler(event) {
         event.preventDefault();
         //send to backend url listener
+
+        console.log(formState.inputs);
 
         //setIsLoading(true); - ABSTRACTED
         if (isSignIn) {
@@ -82,19 +85,19 @@ function Auth(props) {
             }
             */
         } else { //sign up
+
             let responseData;
             try {
+                const formData = new FormData(); //default browser js
+                formData.append("email", formState.inputs.email.value); //formData accepts all datatypes
+                formData.append("name", formState.inputs.name.value);
+                formData.append("password", formState.inputs.password.value);
+                formData.append("image", formState.inputs.image.value); //images are accepted also
+
                 responseData = await sendRequest(
                     "http://localhost:5000/api/users/signup",
                     "POST",
-                    JSON.stringify({
-                        name: formState.inputs.name.value,
-                        email: formState.inputs.email.value,
-                        password: formState.inputs.password.value,
-                    }),
-                    {
-                        "Content-Type": "application/json", //configure type of request to json
-                    }
+                    formData //headers are set automatically using fetch under the hood
                 );
                 auth.login(responseData.user.id);
             } catch (err) {
@@ -129,7 +132,8 @@ function Auth(props) {
             setFormData(
                 {
                     ...formState.inputs,
-                    name: undefined
+                    name: undefined,
+                    image: undefined
                 },
                 formState.inputs.email.isValid && formState.inputs.password.isValid
             );
@@ -139,8 +143,12 @@ function Auth(props) {
                     ...formState.inputs,
                     name: {
                         value: "",
-                        isValid: false
-                    }
+                        isValid: false,
+                    },
+                    image: {
+                        value: null,
+                        isValid: false,
+                    },
                 },
                 false
             );
@@ -159,8 +167,12 @@ function Auth(props) {
         <>
             <ErrorModal error={error} onClear={errorHandler} />
             <Card className="authentication">
-                {isLoading && <LoadingSpinner asOverlay /> /*render a loading spinner*/}
-                <h2> Log In </h2>
+                {
+                    isLoading && (
+                        <LoadingSpinner asOverlay />
+                    ) /*render a loading spinner*/
+                }
+                <h2> {isSignIn ? "Log In" : "Sign-Up"}</h2>
                 <hr />
                 <form className="form" onSubmit={authSubmitHandler}>
                     {!isSignIn && (
@@ -172,6 +184,15 @@ function Auth(props) {
                             validators={[VALIDATOR_REQUIRE()]}
                             errorText="Please enter valid name"
                             onInput={inputHandler}
+                        />
+                    )}
+
+                    {!isSignIn && (
+                        <ImageUpload
+                            center
+                            id="image"
+                            onInput={inputHandler}
+                            errorText="Please provide an image"
                         />
                     )}
 

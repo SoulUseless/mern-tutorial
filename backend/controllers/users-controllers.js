@@ -100,7 +100,7 @@ const userSignup = async (req, res, next) => {
         name,
         password, //plain text for now
         email,
-        image: "https://souluseless.github.io/controlled_alcoholism/images/whisky/hibiki_17.jpg",
+        image: req.file.path, //prefix to the path can be stored on frontend
         places: []
     });
 

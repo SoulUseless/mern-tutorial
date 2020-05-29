@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
@@ -11,6 +14,9 @@ const app = express();
 
 //extract json data from all incoming requests
 app.use(bodyParser.json());
+
+//just returns the file at the specific folder and path
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 //workaround CORS error
 //cannot anyhow send requests cross-url
@@ -42,6 +48,13 @@ app.use((req, res, next) => {
 
 //middleware function with 4 params gets treated as a ERROR HANDLING middleware func
 app.use((error, req, res, next) => {
+    if (req.file) { //multer adds file param in the req => if present means its a file
+        //this triggers when theres an error and req contains a file
+        //delete (unlink) the file using fs module
+        fs.unlink(req.file.path, (err) => {
+            console.log(err);
+        }); 
+    }
     if (res.headerSent) {
         //wont send a response
         //error gets forwarded to next middleware

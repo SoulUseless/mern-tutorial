@@ -9,6 +9,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import { AuthContext } from "../../shared/context/auth-context";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 
 import "./PlaceForm.css";
 
@@ -33,6 +34,10 @@ function NewPlace(props) {
                 value: "",
                 isValid: false,
             },
+            image: {
+                value: null,
+                isValid: false,
+            }
         },
         false
     );
@@ -63,19 +68,17 @@ function NewPlace(props) {
         event.preventDefault();
         //console.log(formState.inputs); //TODO: send to backend
         try {
+            const formData = new FormData();
+            formData.append("title", formState.inputs.title.value); //formData accepts all datatypes
+            formData.append("description", formState.inputs.description.value);
+            formData.append("address", formState.inputs.address.value);
+            formData.append("creator", auth.userId);
+            formData.append("image", formState.inputs.image.value); //images are accepted also
+                
             const response = await sendRequest(
                 "http://localhost:5000/api/places",
                 "POST",
-                JSON.stringify({
-                    title: formState.inputs.title.value,
-                    description: formState.inputs.description.value,
-                    address: formState.inputs.address.value,
-                    creator: auth.userId
-                }),
-                {
-                    "Content-Type": "application/json", //configure type of request to json
-                }
-
+                formData
             );
             console.log(response);
             
@@ -92,7 +95,7 @@ function NewPlace(props) {
                 <div className="center">
                     <LoadingSpinner />
                     {/*render a loading spinner*/}
-                 </div>
+                </div>
             )}
             <form className="place-form" onSubmit={placeSubmitHandler}>
                 <Input
@@ -119,9 +122,17 @@ function NewPlace(props) {
                     element="input"
                     label="Address"
                     validators={[VALIDATOR_REQUIRE()]}
-                    errorText="Please enter a valid address" 
+                    errorText="Please enter a valid address"
                     onInput={inputHandler}
                 />
+
+                <ImageUpload
+                    center
+                    id="image"
+                    onInput={inputHandler}
+                    errorText="Please provide an image"
+                />
+
                 <Button type="submit" disabled={!formState.isValid}>
                     Add New Place
                 </Button>

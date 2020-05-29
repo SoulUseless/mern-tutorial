@@ -3,10 +3,11 @@
 const express = require('express');
 const { check } = require("express-validator");
 
-const router = express.Router();
-const placeControllers = require('../controllers/places-controllers');
+const placeControllers = require('../controllers/places-controllers')
+const fileUpload = require("../middleware/file-upload");
 //can just export the router to app.js
 
+const router = express.Router();
 
 //filter here refers to relative path after being parsed from app.js
 router.get("/:pid", placeControllers.getPlaceById); 
@@ -29,6 +30,7 @@ router.get("/user/:uid", placeControllers.getPlacesByUserId);
 //what we parse afterwards
 router.post(
     "/",
+    fileUpload.single("image"), //retrieve a single file
     [
         check("title").not().isEmpty(),
         check("description").isLength({ min: 5 }),
