@@ -50,7 +50,10 @@ const userLogin = async (req, res, next) => {
     //const user = DUMMY_USERS.find(u => email === u.email);
     if (user) {
         if (user.password === password) {
-            res.status(200).json({ message: "login success" });
+            res.status(200).json({
+                message: "login success",
+                user: user.toObject({ getters: true }),
+            });
         } else {
             next(new HttpError("Password is incorrect", 401));
             return;

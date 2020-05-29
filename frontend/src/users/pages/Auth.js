@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 
 import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input.js";
-import { VALIDATOR_REQUIRE, VALIDATOR_EMAIL } from "../../shared/util/validators.js";
+import { VALIDATOR_REQUIRE, VALIDATOR_EMAIL, VALIDATOR_MINLENGTH } from "../../shared/util/validators.js";
 import Button from "../../shared/components/FormElements/Button.js";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
@@ -44,8 +44,9 @@ function Auth(props) {
         if (isSignIn) {
             //dont need to try catch also since that is also abstracted out
             //instead of fetch
+            let responseData;
             try { //this one to catch whether the log in is successful
-                await sendRequest(
+                responseData = await sendRequest(
                     "http://localhost:5000/api/users/login",
                     "POST",
                     JSON.stringify({
@@ -56,7 +57,7 @@ function Auth(props) {
                         "Content-Type": "application/json", //configure type of request to json
                     }
                 );
-                auth.login();
+                auth.login(responseData.user.id);
             } catch (err) {
                 console.log(err);
                 //just to stop the function when an error happens
@@ -81,8 +82,9 @@ function Auth(props) {
             }
             */
         } else { //sign up
+            let responseData;
             try {
-                await sendRequest(
+                responseData = await sendRequest(
                     "http://localhost:5000/api/users/signup",
                     "POST",
                     JSON.stringify({
@@ -94,7 +96,7 @@ function Auth(props) {
                         "Content-Type": "application/json", //configure type of request to json
                     }
                 );
-                auth.login();
+                auth.login(responseData.user.id);
             } catch (err) {
                 console.log(err);
             }
@@ -188,7 +190,7 @@ function Auth(props) {
                         element="input"
                         type="password"
                         label="Password"
-                        validators={[VALIDATOR_REQUIRE()]}
+                        validators={[VALIDATOR_MINLENGTH(6)]}
                         errorText="Please enter your password"
                         onInput={inputHandler}
                     />

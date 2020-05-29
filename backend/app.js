@@ -53,7 +53,7 @@ app.use((error, req, res, next) => {
 
 });
 
-const url = "mongodb+srv://<username>:<pw>@cluster0-un6y8.gcp.mongodb.net/mern-tutorial?retryWrites=true&w=majority";
+const url = "mongodb+srv://<username>:<password>@cluster0-un6y8.gcp.mongodb.net/mern-tutorial?retryWrites=true&w=majority";
 mongoose
     .connect(url)
     .then(() => {

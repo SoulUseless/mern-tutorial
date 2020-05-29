@@ -5,6 +5,10 @@ import Modal from "../../shared/components/UIElements/Modal.js";
 import Button from "../../shared/components/FormElements/Button.js";
 import Map from "../../shared/components/UIElements/Map.js"; 
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+
 import './PlaceItem.css';
 
 function PlaceItem(props) {
@@ -12,6 +16,7 @@ function PlaceItem(props) {
 
     const [showMap, setShowMap] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const { isLoading, error, sendRequest, errorHandler } = useHttpClient();
 
     function openMapHandler() {
         setShowMap(true);
@@ -29,13 +34,24 @@ function PlaceItem(props) {
         setShowConfirmModal(false);
     }
 
-    function confirmDeleteHandler() {
+    async function confirmDeleteHandler() {
         setShowConfirmModal(false);
-        console.log("DELETED");
+        //console.log("DELETED");
+        try {
+            await sendRequest(
+                `http://localhost:5000/api/places/${props.id}`,
+                "DELETE"
+            );
+            props.onDelete(props.id); //run function parsed in from outside
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (
         <React.Fragment>
+            <ErrorModal error={error} onClear={errorHandler} />
+
             <Modal
                 show={showMap}
                 onCancel={hideMapHandler}
@@ -65,11 +81,17 @@ function PlaceItem(props) {
                     </React.Fragment>
                 }
             >
-                <p class="center">Do you want to proceed and delete?</p>
+                <p className="center">Do you want to proceed and delete?</p>
             </Modal>
 
             <li className="place-item">
                 <Card className="place-item__content">
+                    {isLoading && (
+                        <div className="center">
+                            <LoadingSpinner asOverlay/>
+                            {/*render a loading spinner*/}
+                        </div>
+                    )}
                     <div className="place-item__image">
                         <img src={props.imageUrl} alt={props.title} />
                     </div>
@@ -85,13 +107,11 @@ function PlaceItem(props) {
                             VIEW ON MAP
                         </Button>
 
-                        {auth.isLoggedIn && (
-                            <Button to={`/places/${props.id}`}> 
-                                EDIT 
-                            </Button>
+                        {auth.userId === props.creatorId && (
+                            <Button to={`/places/${props.id}`}>EDIT</Button>
                         )}
 
-                        {auth.isLoggedIn && (
+                        {auth.userId === props.creatorId && (
                             <Button danger onClick={showDeleteWarningHandler}>
                                 DELETE
                             </Button>

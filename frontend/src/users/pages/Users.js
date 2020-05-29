@@ -3,15 +3,30 @@ import React, { useEffect, useState } from "react";
 import UsersList from "../components/UsersList.js";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/http-hook";
  
 function Users() {
+    const { isLoading, error, sendRequest, errorHandler } = useHttpClient();
+    /* ABSTRACTED OUT
     const [isLoading, setIsLoading] = useState(false);
-    
     const [error, setError] = useState();
-    const [loadedUsers, setLoadedUsers] = useState();
+    */
 
+    const [loadedUsers, setLoadedUsers] = useState();
     //fetch user information when certain dependencies change
     useEffect(() => {//useEffect doesnt like a async function
+        const getUsers = async () => {
+            try {
+                const response = await sendRequest("http://localhost:5000/api/users");
+                setLoadedUsers(response.users);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+            
+        getUsers();
+
+        /* ABSTRACTED
         const sendRequest = async () => { //but can wrap an async function inside
             setIsLoading(true);
             try {
@@ -31,12 +46,15 @@ function Users() {
             }
             setIsLoading(false);
         };
-        sendRequest();        
-    }, []);
-    
+        sendRequest();
+        */
+    }, [sendRequest]);
+   
+    /* ABSTRACTED
     const errorHandler = () => {
         setError(null);
     }
+    */
 
     /*
     const USERS = [
