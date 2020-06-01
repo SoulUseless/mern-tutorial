@@ -109,7 +109,7 @@ const getPlacesByUserId = async (req, res, next) => {
 const createPlace = async (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-        const { title, description, address, creator } = req.body;
+        const { title, description, address } = req.body;
 
         //must wrap in try catch block if the async promise can throw an error
         try {
@@ -133,12 +133,12 @@ const createPlace = async (req, res, next) => {
                 address,
                 location: coordinates,
                 image: req.file.path,
-                creator
+                creator: req.userData.userId
             });
             
             let user;
             try {
-                user = await User.findById(creator);
+                user = await User.findById(req.userData.userId);
             } catch (err) {
                 console.log(err);
                 next(new HttpError("database error", 500));
@@ -191,6 +191,7 @@ const createPlace = async (req, res, next) => {
 //patch request also have body
 const updatePlaceById = async (req, res, next) => {
     const errors = validationResult(req);
+    const userId = req.userData.userId;
     if (!errors.isEmpty()) {
         console.log(errors);
         throw new HttpError("Invalid inputs detected", 422);
@@ -205,6 +206,12 @@ const updatePlaceById = async (req, res, next) => {
         } catch (err) {
             console.log(err);
             next(new HttpError("Search failed", 500));
+            return;
+        }
+
+        // fields are stored as special mongoose objects. need to call toString.
+        if (place.creator.toString() !== userId) {
+            next(new HttpError("You are not allowed", 401));
             return;
         }
 
@@ -237,6 +244,7 @@ const updatePlaceById = async (req, res, next) => {
 
 const deletePlace = async (req, res, next) => {
     const placeId = req.params.pid;
+    const userId = req.userData.userId;
     //DUMMY_PLACES = DUMMY_PLACES.filter(p => p.id !== placeId);
 
     //find place first
@@ -252,6 +260,12 @@ const deletePlace = async (req, res, next) => {
 
     if (!place) {
         return next(new HttpError("Search failed, nothing to delete", 404));
+    }
+
+    // this field is stored in string so dunnid toString on this
+    if (place.creator.id !== userId) {
+        next (HttpError("You are not allowed", 401));
+        return;
     }
 
     const imagePath = place.image;

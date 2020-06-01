@@ -68,8 +68,8 @@ function UpdatePlace(props) {
     useEffect(() => {//useEffect doesnt like a async function
         const getPlace = async () => {
             try {
-                console.log(`http://localhost:5000/api/places/${placeId}`);
-                const response = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
+                console.log(`${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`);
+                const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`);
                 setIdentifiedPlace(response.place);
                 console.log(response.place.title);
                 setFormData( //shifted up, can just immeditately load the information
@@ -117,7 +117,7 @@ function UpdatePlace(props) {
         //console.log(formState.inputs); //TODO: send to backend
         event.preventDefault();
         try {
-            await sendRequest(`http://localhost:5000/api/places/${placeId}`, 
+            await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`, 
             "PATCH",
             JSON.stringify({
                 title: formState.inputs.title.value,
@@ -125,6 +125,7 @@ function UpdatePlace(props) {
             }),
             {
                 "Content-Type": "application/json", //configure type of request to json
+                Authorization: `Bearer ${auth.token}`
             });
             console.log("success");
             history.push(`/${auth.userId}`);

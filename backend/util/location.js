@@ -1,4 +1,4 @@
-const API_KEY= "AIzaSyANi_Os56-_aTncXl8DO0ltl-cOv2KvvCs";
+const API_KEY = process.env.GOOGLE_MAP_API;
 const axios = require("axios");
 
 const HttpError = require("../models/http-error");

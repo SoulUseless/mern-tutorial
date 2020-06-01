@@ -39,8 +39,10 @@ function PlaceItem(props) {
         //console.log("DELETED");
         try {
             await sendRequest(
-                `http://localhost:5000/api/places/${props.id}`,
-                "DELETE"
+                process.env.REACT_APP_BACKEND_URL + `/places/${props.id}`,
+                "DELETE",
+                {},
+                { Authorization: `Bearer ${auth.token}` }
             );
             props.onDelete(props.id); //run function parsed in from outside
         } catch (err) {
@@ -93,7 +95,7 @@ function PlaceItem(props) {
                         </div>
                     )}
                     <div className="place-item__image">
-                        <img src={`http://localhost:5000/${props.imageUrl}`} alt={props.title} />
+                        <img src={`${process.env.REACT_APP_ASSET_URL}/${props.imageUrl}`} alt={props.title} />
                     </div>
 
                     <div className="place-item__info">

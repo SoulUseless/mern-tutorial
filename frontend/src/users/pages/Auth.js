@@ -50,7 +50,7 @@ function Auth(props) {
             let responseData;
             try { //this one to catch whether the log in is successful
                 responseData = await sendRequest(
-                    "http://localhost:5000/api/users/login",
+                    process.env.REACT_APP_BACKEND_URL + "/users/login",
                     "POST",
                     JSON.stringify({
                         email: formState.inputs.email.value,
@@ -60,7 +60,7 @@ function Auth(props) {
                         "Content-Type": "application/json", //configure type of request to json
                     }
                 );
-                auth.login(responseData.user.id);
+                auth.login(responseData.userId, responseData.token);
             } catch (err) {
                 console.log(err);
                 //just to stop the function when an error happens
@@ -95,11 +95,11 @@ function Auth(props) {
                 formData.append("image", formState.inputs.image.value); //images are accepted also
 
                 responseData = await sendRequest(
-                    "http://localhost:5000/api/users/signup",
+                    process.env.REACT_APP_BACKEND_URL + "/users/signup",
                     "POST",
                     formData //headers are set automatically using fetch under the hood
                 );
-                auth.login(responseData.user.id);
+                auth.login(responseData.user.id, responseData.token);
             } catch (err) {
                 console.log(err);
             }

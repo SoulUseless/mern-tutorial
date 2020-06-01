@@ -17,7 +17,7 @@ function Users() {
     useEffect(() => {//useEffect doesnt like a async function
         const getUsers = async () => {
             try {
-                const response = await sendRequest("http://localhost:5000/api/users");
+                const response = await sendRequest(process.env.REACT_APP_BACKEND_URL + "/users");
                 setLoadedUsers(response.users);
             } catch (err) {
                 console.log(err);

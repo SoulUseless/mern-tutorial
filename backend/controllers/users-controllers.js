@@ -1,6 +1,6 @@
-
-const express = require('express');
 const { validationResult } = require("express-validator");
+const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
 const { uuid } = require("uuidv4");
@@ -27,6 +27,7 @@ const getAllUsers = async (req, res, next) => {
         next(new HttpError("database access error", 500));
         return;
     }
+
     //const users = User.find()
     res.status(200).json({
         users: users.map((user) => user.toObject({ getters: true })),
@@ -42,24 +43,52 @@ const userLogin = async (req, res, next) => {
     try {
         user = await User.findOne({email});
     } catch (err) {
-        console.log(err);
         next(new HttpError("log in failed", 500));
         return;
     }
 
     //const user = DUMMY_USERS.find(u => email === u.email);
     if (user) {
-        if (user.password === password) {
+        let isValidPassword = false;
+        try {
+            console.log("trig");
+            isValidPassword = await bcryptjs.compare(password, user.password);
+        } catch (err) {
+            console.log(err);
+            next(new HttpError("unknown log in error", 500));
+            return;
+        }
+
+        if (isValidPassword) {
+
+            // creating a token
+            let token;
+            try {
+                token = jwt.sign(
+                    { userId: user.id, email: user.email },
+                    process.env.JWT_SECRET, // server private key --> NOT TO BE SHARED
+                    //private key should be the same for all token creation purposes
+                    { expiresIn: "1h" } // can set self-destruction of the token to prevent token stealing also
+                );
+            } catch (err) {
+                console.log(err);
+                next(new HttpError("sign in failed", 500));
+                return;
+            }
+
             res.status(200).json({
                 message: "login success",
-                user: user.toObject({ getters: true }),
+                userId: user.id,
+                email: user.email, //other information up to us
+                token: token, //impt to return token
             });
+
         } else {
-            next(new HttpError("Password is incorrect", 401));
+            next(new HttpError("Password is incorrect", 403));
             return;
         }
     } else {
-        next(new HttpError("Username is incorrect", 401));
+        next(new HttpError("Username is incorrect", 403));
         return;
     }
 }
@@ -96,9 +125,20 @@ const userSignup = async (req, res, next) => {
 
     DUMMY_USERS.push(createdUser);
     */
+
+    // hashing the password
+    let hashedPassword;
+    try {
+        hashedPassword = await bcryptjs.hash(password, 12); //returns a promise
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("Could not create user", 500));
+        return;
+    }
+
     const createdUser = new User({
         name,
-        password, //plain text for now
+        password: hashedPassword, //encrypted now
         email,
         image: req.file.path, //prefix to the path can be stored on frontend
         places: []
@@ -113,7 +153,25 @@ const userSignup = async (req, res, next) => {
         return;
     }
     
-    res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+    // creating a token
+    let token;
+    try {
+        token = jwt.sign( 
+            { userId: createdUser.id, email: createdUser.email },
+            process.env.JWT_SECRET, // server private key --> NOT TO BE SHARED
+            { expiresIn: "1h" } // can set self-destruction of the token to prevent token stealing also
+        );
+    } catch (err) {
+        console.log(err);
+        next(new HttpError("sign up failed", 500));
+        return;
+    }
+
+    res.status(201).json({
+        userId: createdUser.id,
+        email: createdUser.email, //other information up to us
+        token: token, //impt to return token
+    });
 }
 
 exports.userLogin = userLogin;

@@ -42,11 +42,11 @@ function UserPlaces(props) {
     const { isLoading, error, sendRequest, errorHandler } = useHttpClient();
     const [loadedPlaces, setLoadedPlaces] = useState();
     const userId = useParams().userId;
-    //console.log(`http://localhost:5000/api/places/user/${userId}`);
+    //console.log(`${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`);
     useEffect(() => {//useEffect doesnt like a async function
         const getPlaces = async () => {
             try {
-                const response = await sendRequest(`http://localhost:5000/api/places/user/${userId}`);
+                const response = await sendRequest(`${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`);
                 setLoadedPlaces(response.places);
             } catch (err) {
                 console.log(err);
